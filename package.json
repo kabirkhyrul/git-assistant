@@ -109,8 +109,8 @@
         },
         "gitAssistant.systemPrompt": {
           "type": "string",
-          "default": "You write concise, high-quality conventional commit messages. Return only the final commit message. Prefer a single line. Use imperative mood.",
-          "description": "System prompt sent to Ollama."
+          "default": "Generate exactly one conventional commit message for the staged git changes below.\nRules:\n- Return only the final commit message.\n- Prefer a single-line subject with no body.\n- Keep the subject concise and ideally under 72 characters.\n- Use imperative mood.\n- Choose the most accurate conventional type such as feat, fix, refactor, docs, test, chore, build, ci, perf, or style.",
+          "description": "System prompt sent to Ollama. The staged diff is sent separately as the user message."
         },
         "gitAssistant.diffMaxChars": {
           "type": "number",
@@ -127,7 +127,7 @@
         "gitAssistant.debug": {
           "type": "boolean",
           "default": true,
-          "description": "Enable progress debug output in the Git Assistant output channel."
+          "description": "Enable debug logs in the Git Assistant output channel and write the Ollama payload to git-assistant-request.json."
         },
         "gitAssistant.applyToAllRepositories": {
           "type": "boolean",
