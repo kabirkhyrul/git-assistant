@@ -1,0 +1,150 @@
+{
+  "name": "git-assistant",
+  "displayName": "Git Assistant",
+  "description": "Generate commit messages with Ollama, toggle file exclude rules, and checkout files from another branch.",
+  "version": "1.0.0",
+  "publisher": "DevKabir",
+  "icon": "icon.png",
+  "author": {
+    "name": "Git Assistant Team"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/devkabir/git-assistant",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/devkabir/git-assistant.git"
+  },
+  "bugs": {
+    "url": "https://github.com/devkabir/git-assistant/issues"
+  },
+  "engines": {
+    "vscode": "^1.110.0"
+  },
+  "categories": [
+    "Other",
+    "SCM Providers"
+  ],
+  "keywords": [
+    "git",
+    "ollama",
+    "commit-message",
+    "exclude",
+    "branch",
+    "cleanup",
+    "clean",
+    "prune",
+    "version control",
+    "file management",
+    "ignore files",
+    "git tools",
+    "repository management",
+    "gitignore",
+    "orphaned branches"
+  ],
+  "main": "./dist/extension.js",
+  "extensionDependencies": [
+    "vscode.git"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "gitAssistant.generateCommitMessage",
+        "title": "Git Assistant: Generate Commit Message",
+        "icon": "$(chat-sparkle)"
+      },
+      {
+        "command": "gitAssistant.toggleExcludeFile",
+        "title": "Git Assistant: Toggle Exclude File"
+      },
+      {
+        "command": "gitAssistant.checkoutFileFromBranch",
+        "title": "Git Assistant: Checkout File From Branch"
+      }
+    ],
+    "menus": {
+      "scm/title": [
+        {
+          "when": "scmProvider == git",
+          "command": "gitAssistant.generateCommitMessage",
+          "group": "navigation"
+        }
+      ],
+      "explorer/context": [
+        {
+          "when": "resourceScheme == file",
+          "command": "gitAssistant.toggleExcludeFile",
+          "group": "navigation"
+        },
+        {
+          "when": "resourceScheme == file",
+          "command": "gitAssistant.checkoutFileFromBranch",
+          "group": "navigation"
+        }
+      ],
+      "editor/context": [
+        {
+          "when": "resourceScheme == file",
+          "command": "gitAssistant.toggleExcludeFile",
+          "group": "navigation"
+        },
+        {
+          "when": "resourceScheme == file",
+          "command": "gitAssistant.checkoutFileFromBranch",
+          "group": "navigation"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Git Assistant",
+      "properties": {
+        "gitAssistant.apiUrl": {
+          "type": "string",
+          "default": "http://127.0.0.1:11434/api/chat",
+          "description": "Full Ollama generate API URL."
+        },
+        "gitAssistant.model": {
+          "type": "string",
+          "default": "qwen3.5:2b",
+          "description": "Ollama model used to generate commit messages."
+        },
+        "gitAssistant.systemPrompt": {
+          "type": "string",
+          "default": "You write concise, high-quality conventional commit messages. Return only the final commit message. Prefer a single line. Use imperative mood.",
+          "description": "System prompt sent to Ollama."
+        },
+        "gitAssistant.diffMaxChars": {
+          "type": "number",
+          "default": 4000,
+          "minimum": 1000,
+          "description": "Maximum git diff characters included in the prompt."
+        },
+        "gitAssistant.requestTimeoutMs": {
+          "type": "number",
+          "default": 600000,
+          "minimum": 1000,
+          "description": "Maximum time to wait for Ollama to respond."
+        },
+        "gitAssistant.debug": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable progress debug output in the Git Assistant output channel."
+        },
+        "gitAssistant.applyToAllRepositories": {
+          "type": "boolean",
+          "default": true,
+          "description": "When the command is run without a specific SCM repository context, generate commit messages for all open git repositories."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./ && vsce package",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0",
+    "@types/vscode": "^1.110.0",
+    "@vscode/vsce": "^3.7.1",
+    "typescript": "^5.9.3"
+  }
+}
