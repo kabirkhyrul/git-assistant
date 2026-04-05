@@ -1,10 +1,10 @@
-import * as vscode from 'vscode';
-import { execFile } from 'node:child_process';
-import { promisify } from 'node:util';
-import * as http from 'node:http';
-import * as https from 'node:https';
-import * as fs from 'node:fs';
-import * as path from 'node:path';
+import * as vscode from "vscode";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
+import * as http from "node:http";
+import * as https from "node:https";
+import * as fs from "node:fs";
+import * as path from "node:path";
 
 const execFileAsync = promisify(execFile);
 
@@ -33,49 +33,60 @@ type DebugContext = {
 };
 
 export function activate(context: vscode.ExtensionContext): void {
-  const output = vscode.window.createOutputChannel('Git Assistant');
+  const output = vscode.window.createOutputChannel("Git Assistant");
 
-  const disposable = vscode.commands.registerCommand('gitAssistant.generateCommitMessage', async (scmContext?: ScmCommandContext) => {
-    output.show(true);
-    try {
-      await generateCommitMessages(output, scmContext);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      output.appendLine(`[error] ${message}`);
-      void vscode.window.showErrorMessage(`Git Assistant failed: ${message}`);
-    }
-  });
+  const disposable = vscode.commands.registerCommand(
+    "gitAssistant.generateCommitMessage",
+    async (scmContext?: ScmCommandContext) => {
+      output.show(true);
+      try {
+        await generateCommitMessages(output, scmContext);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        output.appendLine(`[error] ${message}`);
+        void vscode.window.showErrorMessage(`Git Assistant failed: ${message}`);
+      }
+    },
+  );
 
   context.subscriptions.push(disposable, output);
 }
 
 export function deactivate(): void {}
 
-async function generateCommitMessages(output: vscode.OutputChannel, scmContext?: ScmCommandContext): Promise<void> {
+async function generateCommitMessages(
+  output: vscode.OutputChannel,
+  scmContext?: ScmCommandContext,
+): Promise<void> {
   const git = getGitApi();
   if (!git) {
-    throw new Error('VS Code Git extension is unavailable.');
+    throw new Error("VS Code Git extension is unavailable.");
   }
 
-  const config = vscode.workspace.getConfiguration('gitAssistant');
-  const debug = config.get<boolean>('debug', true);
-  const apiUrl = config.get<string>('apiUrl', 'http://127.0.0.1:11434/api/chat').trim();
-  const model = config.get<string>('model', 'qwen3.5:2b');
+  const config = vscode.workspace.getConfiguration("gitAssistant");
+  const debug = config.get<boolean>("debug", true);
+  const apiUrl = config
+    .get<string>("apiUrl", "http://127.0.0.1:11434/api/chat")
+    .trim();
+  const model = config.get<string>("model", "qwen3.5:2b");
   const systemPrompt = config.get<string>(
-    'systemPrompt',
+    "systemPrompt",
     [
-      'Generate exactly one conventional commit message for the staged git changes below.',
-      'Rules:',
-      '- Return only the final commit message.',
-      '- Prefer a single-line subject with no body.',
-      '- Keep the subject concise and ideally under 72 characters.',
-      '- Use imperative mood.',
-      '- Choose the most accurate conventional type such as feat, fix, refactor, docs, test, chore, build, ci, perf, or style.'
-    ].join('\n')
+      "Generate exactly one conventional commit message for the staged git changes below.",
+      "Rules:",
+      "- Return only the final commit message.",
+      "- Prefer a single-line subject with no body.",
+      "- Keep the subject concise and ideally under 72 characters.",
+      "- Use imperative mood.",
+      "- Choose the most accurate conventional type such as feat, fix, refactor, docs, test, chore, build, ci, perf, or style.",
+    ].join("\n"),
   );
-  const diffMaxChars = config.get<number>('diffMaxChars', 4000);
-  const requestTimeoutMs = config.get<number>('requestTimeoutMs', 600000);
-  const applyToAllRepositories = config.get<boolean>('applyToAllRepositories', true);
+  const diffMaxChars = config.get<number>("diffMaxChars", 4000);
+  const requestTimeoutMs = config.get<number>("requestTimeoutMs", 600000);
+  const applyToAllRepositories = config.get<boolean>(
+    "applyToAllRepositories",
+    true,
+  );
   const debugContext: DebugContext = { enabled: debug, output };
 
   log(debugContext, `Using Ollama API URL ${apiUrl}`);
@@ -83,17 +94,32 @@ async function generateCommitMessages(output: vscode.OutputChannel, scmContext?:
   log(debugContext, `Using timeout ${requestTimeoutMs}ms`);
   log(debugContext, `Detected ${git.repositories.length} open repositories`);
 
-  const repositories = resolveRepositories(git, scmContext, applyToAllRepositories);
+  const repositories = resolveRepositories(
+    git,
+    scmContext,
+    applyToAllRepositories,
+  );
   if (repositories.length === 0) {
-    throw new Error('No matching git repository was found.');
+    throw new Error("No matching git repository was found.");
   }
 
   for (const repository of repositories) {
-    await generateCommitMessageForRepository(repository, output, debugContext, apiUrl, model, systemPrompt, diffMaxChars, requestTimeoutMs);
+    await generateCommitMessageForRepository(
+      repository,
+      output,
+      debugContext,
+      apiUrl,
+      model,
+      systemPrompt,
+      diffMaxChars,
+      requestTimeoutMs,
+    );
   }
 
   void vscode.window.showInformationMessage(
-    repositories.length === 1 ? 'Commit message generated.' : `Generated commit messages for ${repositories.length} repositories.`
+    repositories.length === 1
+      ? "Commit message generated."
+      : `Generated commit messages for ${repositories.length} repositories.`,
   );
 }
 
@@ -105,7 +131,7 @@ async function generateCommitMessageForRepository(
   model: string,
   systemPrompt: string,
   diffMaxChars: number,
-  requestTimeoutMs: number
+  requestTimeoutMs: number,
 ): Promise<void> {
   const repoPath = repository.rootUri.fsPath;
   output.appendLine(`[info] Collecting staged changes for ${repoPath}`);
@@ -118,31 +144,34 @@ async function generateCommitMessageForRepository(
   const payload = {
     model,
     messages: [
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: prompt }
+      { role: "system", content: systemPrompt },
+      { role: "user", content: prompt },
     ],
     stream: false,
     think: false,
     options: { temperature: 0.1, num_ctx: 8192, num_predict: 256 },
-    keep_alive: '10m'
+    keep_alive: "10m",
   };
 
   if (debug.enabled) {
-    const requestFile = path.join(repoPath, 'git-assistant-request.json');
-    fs.writeFileSync(requestFile, JSON.stringify(payload, null, 2), 'utf8');
+    const requestFile = path.join(repoPath, "git-assistant-request.json");
+    fs.writeFileSync(requestFile, JSON.stringify(payload, null, 2), "utf8");
     output.appendLine(`[debug] Request body written to ${requestFile}`);
   }
 
   output.appendLine(`[info] Sending request to ${apiUrl}`);
   log(debug, `Sending request to ${apiUrl} for ${repoPath}`);
   const response = await requestOllama(apiUrl, requestTimeoutMs, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
   });
 
   const rawText = await response.text();
-  log(debug, `Received response ${response.status} ${response.statusText} for ${repoPath}`);
+  log(
+    debug,
+    `Received response ${response.status} ${response.statusText} for ${repoPath}`,
+  );
   if (!response.ok) {
     throw new Error(`Ollama API returned ${response.status}: ${rawText}`);
   }
@@ -154,7 +183,7 @@ async function generateCommitMessageForRepository(
 
   const commitMessage = sanitizeCommitMessage(parsed.message?.content);
   if (!commitMessage) {
-    throw new Error('Ollama returned an empty commit message.');
+    throw new Error("Ollama returned an empty commit message.");
   }
 
   await vscode.env.clipboard.writeText(commitMessage);
@@ -163,73 +192,80 @@ async function generateCommitMessageForRepository(
   log(debug, `Commit message generated: ${commitMessage}`);
 }
 
-async function collectStagedDiff(cwd: string, diffMaxChars: number, debug: DebugContext): Promise<string> {
+async function collectStagedDiff(
+  cwd: string,
+  diffMaxChars: number,
+  debug: DebugContext,
+): Promise<string> {
   log(debug, `Running staged diff collection for ${cwd}`);
-  const [nameStatus, stat, diff] = await Promise.all([
-    runGit(['diff', '--cached', '--name-status', '--find-renames'], cwd, debug),
-    runGit(['diff', '--cached', '--stat', '--find-renames'], cwd, debug),
-    runGit(['diff', '--cached', '--no-ext-diff', '--unified=3', '--find-renames'], cwd, debug)
-  ]);
+  const diff = await runGit(
+    ["diff", "--cached", "--no-ext-diff", "--unified=3", "--find-renames"],
+    cwd,
+    debug,
+  );
 
-  if (!nameStatus.trim() && !diff.trim()) {
-    throw new Error('No staged changes found. Stage your changes before generating a commit message.');
+  if (!diff.trim()) {
+    throw new Error(
+      "No staged changes found. Stage your changes before generating a commit message.",
+    );
   }
 
   const compact = (text: string): string =>
     text
-      .split('\n')
+      .split("\n")
       .map((line) => line.trimEnd())
       .filter(Boolean)
-      .join('\n');
+      .join("\n");
 
-  const body = [
-    `STAGED_NAME_STATUS:\n${compact(nameStatus) || '(empty)'}`,
-    `STAGED_STAT:\n${compact(stat) || '(empty)'}`,
-    `STAGED_DIFF:\n${compact(diff) || '(empty)'}`
-  ].join('\n\n');
-
-  return body.slice(0, diffMaxChars);
+  return compact(diff).slice(0, diffMaxChars);
 }
 
-async function runGit(args: string[], cwd: string, debug: DebugContext): Promise<string> {
-  log(debug, `Running git ${args.join(' ')} in ${cwd}`);
+async function runGit(
+  args: string[],
+  cwd: string,
+  debug: DebugContext,
+): Promise<string> {
+  log(debug, `Running git ${args.join(" ")} in ${cwd}`);
   try {
-    const { stdout } = await execFileAsync('git', args, { cwd, maxBuffer: 1024 * 1024 * 8 });
+    const { stdout } = await execFileAsync("git", args, {
+      cwd,
+      maxBuffer: 1024 * 1024 * 8,
+    });
     return stdout.trim();
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    throw new Error(`git ${args.join(' ')} failed: ${message}`);
+    throw new Error(`git ${args.join(" ")} failed: ${message}`);
   }
 }
 
 function buildUserPrompt(stagedDiff: string): string {
-  return ['Staged changes:', stagedDiff].join('\n');
+  return ["Staged changes:", stagedDiff].join("\n");
 }
 
 function sanitizeCommitMessage(value?: string): string {
-  const cleaned = (value ?? '')
-    .replace(/<think[\s\S]*?<\/think>/gi, '')
-    .replace(/```[\s\S]*?```/g, '')
-    .replace(/^commit message\s*:\s*/i, '')
-    .replace(/^message\s*:\s*/i, '')
+  const cleaned = (value ?? "")
+    .replace(/<think[\s\S]*?<\/think>/gi, "")
+    .replace(/```[\s\S]*?```/g, "")
+    .replace(/^commit message\s*:\s*/i, "")
+    .replace(/^message\s*:\s*/i, "")
     .trim()
-    .replace(/^["'`]+|["'`]+$/g, '');
+    .replace(/^["'`]+|["'`]+$/g, "");
 
   const lines = cleaned
-    .split('\n')
+    .split("\n")
     .map((line) => line.trim())
     .filter(Boolean)
-    .map((line) => line.replace(/^[-*]\s+/, '').trim())
-    .map((line) => line.replace(/^\d+\.\s+/, '').trim())
-    .map((line) => line.replace(/^["'`]+|["'`]+$/g, '').trim());
+    .map((line) => line.replace(/^[-*]\s+/, "").trim())
+    .map((line) => line.replace(/^\d+\.\s+/, "").trim())
+    .map((line) => line.replace(/^["'`]+|["'`]+$/g, "").trim());
 
   if (lines.length === 0) {
-    return '';
+    return "";
   }
 
   const preferredLine =
     lines.find((line) => /^[a-z]+(\([^)]+\))?!?:\s+\S+/i.test(line)) ??
-    lines.find((line) => line.includes(':')) ??
+    lines.find((line) => line.includes(":")) ??
     lines[0];
 
   return preferredLine.trim();
@@ -256,7 +292,11 @@ type OllamaHttpResponse = {
   text(): Promise<string>;
 };
 
-async function requestOllama(input: string, timeoutMs: number, options?: OllamaRequestOptions): Promise<OllamaHttpResponse> {
+async function requestOllama(
+  input: string,
+  timeoutMs: number,
+  options?: OllamaRequestOptions,
+): Promise<OllamaHttpResponse> {
   let url: URL;
   try {
     url = new URL(input);
@@ -264,25 +304,40 @@ async function requestOllama(input: string, timeoutMs: number, options?: OllamaR
     throw new Error(`Invalid Ollama API URL: ${input}: ${String(error)}`);
   }
 
-  const transport = url.protocol === 'https:' ? https : http;
+  const transport = url.protocol === "https:" ? https : http;
 
   return new Promise<OllamaHttpResponse>((resolve, reject) => {
-    const request = transport.request(url, { method: options?.method ?? 'GET', headers: options?.headers }, (response) => {
-      const chunks: Buffer[] = [];
-      response.on('data', (chunk) => chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk)));
-      response.on('end', () => {
-        const rawText = Buffer.concat(chunks).toString('utf8');
-        resolve({
-          status: response.statusCode ?? 0,
-          statusText: response.statusMessage ?? '',
-          ok: (response.statusCode ?? 0) >= 200 && (response.statusCode ?? 0) < 300,
-          text: async () => rawText
+    const request = transport.request(
+      url,
+      {
+        method: options?.method ?? "GET",
+        headers: options?.headers,
+      },
+      (response) => {
+        const chunks: Buffer[] = [];
+        response.on("data", (chunk) =>
+          chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk)),
+        );
+        response.on("end", () => {
+          const rawText = Buffer.concat(chunks).toString("utf8");
+          resolve({
+            status: response.statusCode ?? 0,
+            statusText: response.statusMessage ?? "",
+            ok:
+              (response.statusCode ?? 0) >= 200 &&
+              (response.statusCode ?? 0) < 300,
+            text: async () => rawText,
+          });
         });
-      });
-    });
+      },
+    );
 
-    request.setTimeout(timeoutMs, () => request.destroy(new Error(`Request timed out after ${timeoutMs}ms`)));
-    request.on('error', (error) => reject(new Error(`Failed to reach Ollama at ${input}: ${error.message}`)));
+    request.setTimeout(timeoutMs, () =>
+      request.destroy(new Error(`Request timed out after ${timeoutMs}ms`)),
+    );
+    request.on("error", (error) =>
+      reject(new Error(`Failed to reach Ollama at ${input}: ${error.message}`)),
+    );
 
     if (options?.body) {
       request.write(options.body);
@@ -292,12 +347,19 @@ async function requestOllama(input: string, timeoutMs: number, options?: OllamaR
 }
 
 function getGitApi(): GitApi | undefined {
-  const extension = vscode.extensions.getExtension<{ getAPI(version: number): GitApi }>('vscode.git');
+  const extension = vscode.extensions.getExtension<{
+    getAPI(version: number): GitApi;
+  }>("vscode.git");
   return extension?.exports?.getAPI(1);
 }
 
-function resolveRepositories(git: GitApi, scmContext: ScmCommandContext | undefined, applyToAllRepositories: boolean): CommandRepository[] {
-  const contextPath = scmContext?._rootUri?.fsPath ?? scmContext?.rootUri?.fsPath;
+function resolveRepositories(
+  git: GitApi,
+  scmContext: ScmCommandContext | undefined,
+  applyToAllRepositories: boolean,
+): CommandRepository[] {
+  const contextPath =
+    scmContext?._rootUri?.fsPath ?? scmContext?.rootUri?.fsPath;
   if (contextPath) {
     return git.repositories.filter((r) => r.rootUri.fsPath === contextPath);
   }
@@ -306,10 +368,13 @@ function resolveRepositories(git: GitApi, scmContext: ScmCommandContext | undefi
     return git.repositories;
   }
 
-  const activeWorkspacePath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+  const activeWorkspacePath =
+    vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
   if (!activeWorkspacePath) {
     return [];
   }
 
-  return git.repositories.filter((r) => r.rootUri.fsPath === activeWorkspacePath);
+  return git.repositories.filter(
+    (r) => r.rootUri.fsPath === activeWorkspacePath,
+  );
 }
