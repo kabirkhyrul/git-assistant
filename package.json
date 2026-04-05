@@ -80,18 +80,6 @@
           "command": "gitAssistant.checkoutFileFromBranch",
           "group": "navigation"
         }
-      ],
-      "editor/context": [
-        {
-          "when": "resourceScheme == file",
-          "command": "gitAssistant.toggleExcludeFile",
-          "group": "navigation"
-        },
-        {
-          "when": "resourceScheme == file",
-          "command": "gitAssistant.checkoutFileFromBranch",
-          "group": "navigation"
-        }
       ]
     },
     "configuration": {
