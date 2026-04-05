@@ -41,7 +41,7 @@ export async function toggleExcludeFile(
   uri: vscode.Uri,
   output: vscode.OutputChannel,
 ): Promise<void> {
-  const debug = vscode.workspace.getConfiguration("gitAssistant").get<boolean>("debug", true);
+  const debug = vscode.workspace.getConfiguration("gitKit").get<boolean>("debug", true);
 
   const repoRoot = getRepoRoot(uri);
   if (!repoRoot) {
@@ -90,7 +90,7 @@ export async function checkoutFileFromBranch(
   uri: vscode.Uri,
   output: vscode.OutputChannel,
 ): Promise<void> {
-  const debug = vscode.workspace.getConfiguration("gitAssistant").get<boolean>("debug", true);
+  const debug = vscode.workspace.getConfiguration("gitKit").get<boolean>("debug", true);
 
   const repoRoot = getRepoRoot(uri);
   if (!repoRoot) {

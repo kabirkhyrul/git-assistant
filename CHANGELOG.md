@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to `git-assistant` are documented here.
+All notable changes to `git-kit` are documented here.
 
 ## [1.2.0] - 2026-04-02
 

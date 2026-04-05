@@ -1,8 +1,8 @@
-# Git Assistant
+# Git Kit
 
 **Silent. Powerful. Expert Git tools at your fingertips.**
 
-Git Assistant provides advanced Git file management tools directly in VS Code's context menus. Perfect for developers who need precise control over their Git workflow without leaving their editor.
+Git Kit provides advanced Git file management tools directly in VS Code's context menus. Perfect for developers who need precise control over their Git workflow without leaving their editor.
 
 ## Features
 
@@ -20,12 +20,12 @@ Git Assistant provides advanced Git file management tools directly in VS Code's 
 
 ## Settings
 
-- `gitAssistant.apiUrl`
-- `gitAssistant.model`
-- `gitAssistant.systemPrompt`
-- `gitAssistant.diffMaxChars`
-- `gitAssistant.debug`
-- `gitAssistant.applyToAllRepositories`
+- `gitKit.apiUrl`
+- `gitKit.model`
+- `gitKit.systemPrompt`
+- `gitKit.diffMaxChars`
+- `gitKit.debug`
+- `gitKit.applyToAllRepositories`
 
 ## Notes
 
@@ -35,11 +35,11 @@ Git Assistant provides advanced Git file management tools directly in VS Code's 
 
 ## Usage
 
-Run `Git Assistant: Generate Commit Message` from the Command Palette.
+Run `Git Kit: Generate Commit Message` from the Command Palette.
 
 From the Source Control title bar, the command runs for the selected repository.
 
 From the editor or Explorer context menu, you can use:
 
-- `Git Assistant: Toggle Exclude File`
-- `Git Assistant: Checkout File From Branch`
+- `Git Kit: Toggle Exclude File`
+- `Git Kit: Checkout File From Branch`

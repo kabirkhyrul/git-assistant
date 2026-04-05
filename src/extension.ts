@@ -4,10 +4,10 @@ import type { ScmCommandContext } from "./commit";
 import { toggleExcludeFile, checkoutFileFromBranch } from "./gitops";
 
 export function activate(context: vscode.ExtensionContext): void {
-  const output = vscode.window.createOutputChannel("Git Assistant");
+  const output = vscode.window.createOutputChannel("Git Kit");
 
   const disposable = vscode.commands.registerCommand(
-    "gitAssistant.generateCommitMessage",
+    "gitKit.generateCommitMessage",
     async (scmContext?: ScmCommandContext) => {
       output.show(true);
       try {
@@ -15,13 +15,13 @@ export function activate(context: vscode.ExtensionContext): void {
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
         output.appendLine(`[error] ${message}`);
-        void vscode.window.showErrorMessage(`Git Assistant failed: ${message}`);
+        void vscode.window.showErrorMessage(`Git Kit failed: ${message}`);
       }
     },
   );
 
   const excludeDisposable = vscode.commands.registerCommand(
-    "gitAssistant.toggleExcludeFile",
+    "gitKit.toggleExcludeFile",
     async (uri: vscode.Uri) => {
       output.show(true);
       try {
@@ -29,13 +29,13 @@ export function activate(context: vscode.ExtensionContext): void {
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
         output.appendLine(`[error] ${message}`);
-        void vscode.window.showErrorMessage(`Git Assistant failed: ${message}`);
+        void vscode.window.showErrorMessage(`Git Kit failed: ${message}`);
       }
     },
   );
 
   const checkoutDisposable = vscode.commands.registerCommand(
-    "gitAssistant.checkoutFileFromBranch",
+    "gitKit.checkoutFileFromBranch",
     async (uri: vscode.Uri) => {
       output.show(true);
       try {
@@ -43,7 +43,7 @@ export function activate(context: vscode.ExtensionContext): void {
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
         output.appendLine(`[error] ${message}`);
-        void vscode.window.showErrorMessage(`Git Assistant failed: ${message}`);
+        void vscode.window.showErrorMessage(`Git Kit failed: ${message}`);
       }
     },
   );

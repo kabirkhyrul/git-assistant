@@ -1,21 +1,21 @@
 {
-  "name": "git-assistant",
-  "displayName": "Git Assistant",
+  "name": "git-kit",
+  "displayName": "Git Kit",
   "description": "Generate commit messages with Ollama, toggle file exclude rules, and checkout files from another branch.",
   "version": "1.0.0",
   "publisher": "DevKabir",
   "icon": "icon.png",
   "author": {
-    "name": "Git Assistant Team"
+    "name": "Git Kit Team"
   },
   "license": "MIT",
-  "homepage": "https://github.com/devkabir/git-assistant",
+  "homepage": "https://github.com/devkabir/git-kit",
   "repository": {
     "type": "git",
-    "url": "https://github.com/devkabir/git-assistant.git"
+    "url": "https://github.com/devkabir/git-kit.git"
   },
   "bugs": {
-    "url": "https://github.com/devkabir/git-assistant/issues"
+    "url": "https://github.com/devkabir/git-kit/issues"
   },
   "engines": {
     "vscode": "^1.110.0"
@@ -48,76 +48,76 @@
   "contributes": {
     "commands": [
       {
-        "command": "gitAssistant.generateCommitMessage",
-        "title": "Git Assistant: Generate Commit Message",
+        "command": "gitKit.generateCommitMessage",
+        "title": "Git Kit: Generate Commit Message",
         "icon": "$(chat-sparkle)"
       },
       {
-        "command": "gitAssistant.toggleExcludeFile",
-        "title": "Git Assistant: Toggle Exclude File"
+        "command": "gitKit.toggleExcludeFile",
+        "title": "Git Kit: Toggle Exclude File"
       },
       {
-        "command": "gitAssistant.checkoutFileFromBranch",
-        "title": "Git Assistant: Checkout File From Branch"
+        "command": "gitKit.checkoutFileFromBranch",
+        "title": "Git Kit: Checkout File From Branch"
       }
     ],
     "menus": {
       "scm/title": [
         {
           "when": "scmProvider == git",
-          "command": "gitAssistant.generateCommitMessage",
+          "command": "gitKit.generateCommitMessage",
           "group": "navigation"
         }
       ],
       "explorer/context": [
         {
           "when": "resourceScheme == file",
-          "command": "gitAssistant.toggleExcludeFile",
+          "command": "gitKit.toggleExcludeFile",
           "group": "navigation"
         },
         {
           "when": "resourceScheme == file",
-          "command": "gitAssistant.checkoutFileFromBranch",
+          "command": "gitKit.checkoutFileFromBranch",
           "group": "navigation"
         }
       ]
     },
     "configuration": {
-      "title": "Git Assistant",
+      "title": "Git Kit",
       "properties": {
-        "gitAssistant.apiUrl": {
+        "gitKit.apiUrl": {
           "type": "string",
           "default": "http://127.0.0.1:11434/api/chat",
           "description": "Full Ollama generate API URL."
         },
-        "gitAssistant.model": {
+        "gitKit.model": {
           "type": "string",
           "default": "qwen3.5:2b",
           "description": "Ollama model used to generate commit messages."
         },
-        "gitAssistant.systemPrompt": {
+        "gitKit.systemPrompt": {
           "type": "string",
           "default": "Generate exactly one conventional commit message for the staged git changes below.\nRules:\n- Return only the final commit message.\n- Prefer a single-line subject with no body.\n- Keep the subject concise and ideally under 72 characters.\n- Use imperative mood.\n- Choose the most accurate conventional type such as feat, fix, refactor, docs, test, chore, build, ci, perf, or style.",
           "description": "System prompt sent to Ollama. The staged diff is sent separately as the user message."
         },
-        "gitAssistant.diffMaxChars": {
+        "gitKit.diffMaxChars": {
           "type": "number",
           "default": 4000,
           "minimum": 1000,
           "description": "Maximum git diff characters included in the prompt."
         },
-        "gitAssistant.requestTimeoutMs": {
+        "gitKit.requestTimeoutMs": {
           "type": "number",
           "default": 600000,
           "minimum": 1000,
           "description": "Maximum time to wait for Ollama to respond."
         },
-        "gitAssistant.debug": {
+        "gitKit.debug": {
           "type": "boolean",
           "default": true,
-          "description": "Enable debug logs in the Git Assistant output channel and write the Ollama payload to git-assistant-request.json."
+          "description": "Enable debug logs in the Git Kit output channel and write the Ollama payload to git-kit-request.json."
         },
-        "gitAssistant.applyToAllRepositories": {
+        "gitKit.applyToAllRepositories": {
           "type": "boolean",
           "default": true,
           "description": "When the command is run without a specific SCM repository context, generate commit messages for all open git repositories."

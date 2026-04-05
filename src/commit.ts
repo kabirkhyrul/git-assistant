@@ -41,7 +41,7 @@ export async function generateCommitMessages(
     throw new Error("VS Code Git extension is unavailable.");
   }
 
-  const config = vscode.workspace.getConfiguration("gitAssistant");
+  const config = vscode.workspace.getConfiguration("gitKit");
   const debug = config.get<boolean>("debug", true);
   const apiUrl = config
     .get<string>("apiUrl", "http://127.0.0.1:11434/api/chat")
@@ -132,7 +132,7 @@ async function generateCommitMessageForRepository(
   };
 
   if (debug.enabled) {
-    const requestFile = path.join(repoPath, "git-assistant-request.json");
+    const requestFile = path.join(repoPath, "git-kit-request.json");
     fs.writeFileSync(requestFile, JSON.stringify(payload, null, 2), "utf8");
     output.appendLine(`[debug] Request body written to ${requestFile}`);
   }

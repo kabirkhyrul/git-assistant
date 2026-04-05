@@ -9,7 +9,7 @@ src/**
 esbuild.js
 vsc-extension-quickstart.md
 bun.lock
-git-assistant-request.json
+git-kit-request.json
 **/tsconfig.json
 **/eslint.config.mjs
 **/*.map

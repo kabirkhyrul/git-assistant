@@ -3,5 +3,5 @@ node_modules
 .vscode-test/
 *.vsix
 dist
-git-assistant-request.json
+git-kit-request.json
 .idea
