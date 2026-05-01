@@ -2,7 +2,7 @@
   "name": "git-kit",
   "displayName": "Git Kit",
   "description": "Generate commit messages with Ollama, toggle file exclude rules, and checkout files from another branch.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "publisher": "DevKabir",
   "icon": "icon.png",
   "author": {
@@ -108,7 +108,7 @@
         },
         "gitKit.requestTimeoutMs": {
           "type": "number",
-          "default": 600000,
+          "default": 60000,
           "minimum": 1000,
           "description": "Maximum time to wait for Ollama to respond."
         },

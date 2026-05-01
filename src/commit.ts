@@ -60,7 +60,7 @@ export async function generateCommitMessages(
     ].join("\n"),
   );
   const diffMaxChars = config.get<number>("diffMaxChars", 4000);
-  const requestTimeoutMs = config.get<number>("requestTimeoutMs", 600000);
+  const requestTimeoutMs = config.get<number>("requestTimeoutMs", 60000);
   const applyToAllRepositories = config.get<boolean>(
     "applyToAllRepositories",
     true,

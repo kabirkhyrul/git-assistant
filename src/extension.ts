@@ -10,13 +10,23 @@ export function activate(context: vscode.ExtensionContext): void {
     "gitKit.generateCommitMessage",
     async (scmContext?: ScmCommandContext) => {
       output.show(true);
-      try {
-        await generateCommitMessages(output, scmContext);
-      } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        output.appendLine(`[error] ${message}`);
-        void vscode.window.showErrorMessage(`Git Kit failed: ${message}`);
-      }
+      await vscode.window.withProgress(
+        {
+          location: vscode.ProgressLocation.Notification,
+          title: "Git Kit: Generating commit message…",
+          cancellable: false,
+        },
+        async () => {
+          try {
+            await generateCommitMessages(output, scmContext);
+          } catch (error) {
+            const message =
+              error instanceof Error ? error.message : String(error);
+            output.appendLine(`[error] ${message}`);
+            void vscode.window.showErrorMessage(`Git Kit failed: ${message}`);
+          }
+        },
+      );
     },
   );
 
