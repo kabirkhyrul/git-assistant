@@ -23,7 +23,10 @@ export type ScmCommandContext = {
 };
 
 type OllamaResponse = {
+  // Ollama native format
   message?: { role: string; content: string };
+  // OpenAI-compatible format
+  choices?: { message?: { role: string; content: string } }[];
   error?: string;
 };
 
@@ -159,7 +162,9 @@ async function generateCommitMessageForRepository(
     throw new Error(parsed.error);
   }
 
-  const commitMessage = sanitizeCommitMessage(parsed.message?.content);
+  const rawContent =
+    parsed.message?.content ?? parsed.choices?.[0]?.message?.content;
+  const commitMessage = sanitizeCommitMessage(rawContent);
   if (!commitMessage) {
     throw new Error("Ollama returned an empty commit message.");
   }
